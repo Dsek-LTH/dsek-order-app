@@ -1,8 +1,14 @@
 import { View } from 'react-native';
 import OrderComponent from './Order';
-import { Order } from '../src/types';
+import { Order, SetSelectedOrderId } from '../src/types';
 
-export default function Orders({ orders }: { orders: Order[] }) {
+export default function Orders({
+  orders,
+  setSelectedOrderId,
+}: {
+  orders: Order[];
+  setSelectedOrderId?: SetSelectedOrderId;
+}) {
   return (
     <View
       style={{
@@ -13,7 +19,11 @@ export default function Orders({ orders }: { orders: Order[] }) {
       }}
     >
       {orders.map((order) => (
-        <OrderComponent key={order.id} order={order} />
+        <OrderComponent
+          key={order.id}
+          order={order}
+          setSelectedOrderId={setSelectedOrderId}
+        />
       ))}
     </View>
   );
