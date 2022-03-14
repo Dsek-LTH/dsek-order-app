@@ -7,10 +7,6 @@ import Orders from './components/Orders';
 import { fetchAllOrders } from './src/api';
 import { Order } from './src/types';
 import { useInterval } from './src/utils';
-import { registerForPushNotifications } from './src/notifications';
-import { Subscription } from 'expo-modules-core';
-import { BackgroundFetchStatus, getStatusAsync } from 'expo-background-fetch';
-import { isTaskRegisteredAsync } from 'expo-task-manager';
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -29,7 +25,7 @@ export default function App() {
   const noOrders =
     !loading && unfinishedOrders.length === 0 && finishedOrders.length === 0;
 
-  useEffect(() => {
+  useInterval(() => {
     fetchAllOrders().then((data) => {
       if (data) {
         setUnfinishedOrders(data.unfinishedOrders);
@@ -37,7 +33,7 @@ export default function App() {
       }
       setLoading(false);
     });
-  }, []);
+  }, 1000);
 
   return (
     <Provider>

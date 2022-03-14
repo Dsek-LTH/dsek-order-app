@@ -14,7 +14,7 @@ export const fetchAllOrders = async () => {
 
 export const subscribeToOrder = (id: number, token: string) =>
   fetch(`${URL}/order/subscribe`, {
-    method: 'PUT',
+    method: 'POST',
     body: JSON.stringify({ id, token }),
     headers: {
       'Content-Type': 'application/json',
