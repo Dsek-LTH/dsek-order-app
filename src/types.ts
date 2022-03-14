@@ -1,6 +1,6 @@
 export type Order = {
   id: number;
-  content: string;
+  orders: string[];
   isDone: boolean;
 };
 

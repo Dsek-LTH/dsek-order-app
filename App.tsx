@@ -7,18 +7,10 @@ import Orders from './components/Orders';
 import { fetchAllOrders } from './src/api';
 import { Order } from './src/types';
 import { useInterval } from './src/utils';
-import {
-  registerForPushNotifications,
-  scheduleNotificationMealDone,
-} from './src/notifications';
+import { registerForPushNotifications } from './src/notifications';
 import { Subscription } from 'expo-modules-core';
 import { BackgroundFetchStatus, getStatusAsync } from 'expo-background-fetch';
 import { isTaskRegisteredAsync } from 'expo-task-manager';
-import {
-  CHECK_ORDER_DONE,
-  registerBackgroundFetchSelectedOrder,
-  unregisterBackgroundFetchSelectedOrder,
-} from './src/backgroundFetch';
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -34,53 +26,27 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [selectedOrderId, setSelectedOrderId] = useState<number | undefined>();
 
-  useEffect(() => {
-    registerForPushNotifications();
-  }, []);
-
-  useEffect(() => {
-    if (selectedOrderId) {
-      registerBackgroundFetchSelectedOrder(selectedOrderId);
-    }
-  }, [selectedOrderId]);
-
   const noOrders =
     !loading && unfinishedOrders.length === 0 && finishedOrders.length === 0;
 
   useEffect(() => {
-    const orders = [...finishedOrders, ...unfinishedOrders];
-    if (selectedOrderId) {
-      const selectedOrder = orders.find(
-        (order) => order.id === selectedOrderId
-      );
-      if (selectedOrder) {
-        if (selectedOrder.isDone) {
-          setSelectedOrderId(undefined);
-          unregisterBackgroundFetchSelectedOrder();
-        }
-      } else {
-        setSelectedOrderId(undefined);
-        unregisterBackgroundFetchSelectedOrder();
-      }
-    }
-  }, [finishedOrders]);
-
-  useInterval(() => {
-    fetchAllOrders().then((orders) => {
-      if (orders) {
-        setUnfinishedOrders(orders.filter((order) => !order.isDone));
-        setFinishedOrders(orders.filter((order) => order.isDone));
+    fetchAllOrders().then((data) => {
+      if (data) {
+        setUnfinishedOrders(data.unfinishedOrders);
+        setFinishedOrders(data.finishedOrders);
       }
       setLoading(false);
     });
-  }, 1000);
+  }, []);
 
   return (
     <Provider>
       <ScrollView contentContainerStyle={styles.container}>
-        {selectedOrderId && (
-          <Text>Du kommer få en notis när {selectedOrderId} är klar</Text>
-        )}
+        <Text>
+          {selectedOrderId === undefined
+            ? 'Tryck på en order för att subscriba!'
+            : `Du kommer få en notis när ${selectedOrderId} är klar!`}
+        </Text>
         {loading && (
           <View
             style={{

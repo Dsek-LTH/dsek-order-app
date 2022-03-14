@@ -10,6 +10,7 @@ import { isDevice } from 'expo-device';
 import { Platform } from 'react-native';
 import { Order } from './types';
 
+/*
 export async function scheduleNotificationMealDone(order: Order) {
   await scheduleNotificationAsync({
     content: {
@@ -19,6 +20,7 @@ export async function scheduleNotificationMealDone(order: Order) {
     trigger: null,
   });
 }
+*/
 
 export async function registerForPushNotifications() {
   let token;

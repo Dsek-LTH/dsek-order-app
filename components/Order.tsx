@@ -1,6 +1,8 @@
 import { Card, List } from 'react-native-paper';
 import { Text } from 'react-native';
 import { Order, SetSelectedOrderId } from '../src/types';
+import { registerForPushNotifications } from '../src/notifications';
+import { subscribeToOrder } from '../src/api';
 
 export default function OrderComponent({
   order,
@@ -20,7 +22,21 @@ export default function OrderComponent({
       }}
       onPress={() => {
         if (setSelectedOrderId) {
-          setSelectedOrderId(order.id);
+          registerForPushNotifications().then((token) => {
+            if (token) {
+              subscribeToOrder(order.id, token)
+                .then((response) => {
+                  setSelectedOrderId(order.id);
+                  return response.json();
+                })
+                .then((data) => {
+                  console.log(data);
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            }
+          });
         }
       }}
     >
@@ -28,7 +44,7 @@ export default function OrderComponent({
         {order.id}
       </Text>
       <Text style={{ fontSize: 16, textAlign: 'center', width: '100%' }}>
-        {order.content}
+        {`[${order.orders.join(', ')}]`}
       </Text>
     </Card>
   );
