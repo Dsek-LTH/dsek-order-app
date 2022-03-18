@@ -25,15 +25,34 @@ export default function App() {
   const noOrders =
     !loading && unfinishedOrders.length === 0 && finishedOrders.length === 0;
 
-  useInterval(() => {
-    fetchAllOrders().then((data) => {
-      if (data) {
-        setUnfinishedOrders(data.unfinishedOrders);
-        setFinishedOrders(data.finishedOrders);
-      }
-      setLoading(false);
-    });
-  }, 1000);
+  useInterval(
+    () => {
+      fetchAllOrders().then((data) => {
+        if (data) {
+          setUnfinishedOrders(data.unfinishedOrders);
+          setFinishedOrders(data.finishedOrders);
+          const unfinishedOrders = data.unfinishedOrders;
+          const finishedOrders = data.finishedOrders;
+          const allOrders = [...unfinishedOrders, ...finishedOrders];
+          if (selectedOrderId !== undefined) {
+            if (!allOrders.map((order) => order.id).includes(selectedOrderId)) {
+              console.log(selectedOrderId, 'not found anywhere');
+              setSelectedOrderId(undefined);
+            } else if (
+              finishedOrders.map((order) => order.id).includes(selectedOrderId)
+            ) {
+              //console.log(finishedOrders);
+              console.log(selectedOrderId, ' found in ', finishedOrders);
+              setSelectedOrderId(undefined);
+            }
+          }
+        }
+        setLoading(false);
+      });
+    },
+    1000,
+    [selectedOrderId]
+  );
 
   return (
     <Provider>
@@ -85,6 +104,7 @@ export default function App() {
         )}
         <Orders
           orders={unfinishedOrders}
+          selectedOrderId={selectedOrderId}
           setSelectedOrderId={setSelectedOrderId}
         />
         <StatusBar style="auto" />

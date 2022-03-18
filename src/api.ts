@@ -20,3 +20,12 @@ export const subscribeToOrder = (id: number, token: string) =>
       'Content-Type': 'application/json',
     },
   });
+
+export const unsubscribeToOrder = (id: number, token: string) =>
+  fetch(`${URL}/order/unsubscribe`, {
+    method: 'POST',
+    body: JSON.stringify({ id, token }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });

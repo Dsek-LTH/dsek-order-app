@@ -4,9 +4,11 @@ import { Order, SetSelectedOrderId } from '../src/types';
 
 export default function Orders({
   orders,
+  selectedOrderId,
   setSelectedOrderId,
 }: {
   orders: Order[];
+  selectedOrderId?: number;
   setSelectedOrderId?: SetSelectedOrderId;
 }) {
   return (
@@ -22,6 +24,7 @@ export default function Orders({
         <OrderComponent
           key={order.id}
           order={order}
+          selectedOrderId={selectedOrderId}
           setSelectedOrderId={setSelectedOrderId}
         />
       ))}

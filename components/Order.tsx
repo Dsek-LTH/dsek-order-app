@@ -2,13 +2,15 @@ import { Card, List } from 'react-native-paper';
 import { Text } from 'react-native';
 import { Order, SetSelectedOrderId } from '../src/types';
 import { registerForPushNotifications } from '../src/notifications';
-import { subscribeToOrder } from '../src/api';
+import { subscribeToOrder, unsubscribeToOrder } from '../src/api';
 
 export default function OrderComponent({
   order,
+  selectedOrderId,
   setSelectedOrderId,
 }: {
   order: Order;
+  selectedOrderId?: number;
   setSelectedOrderId?: SetSelectedOrderId;
 }) {
   return (
@@ -19,22 +21,42 @@ export default function OrderComponent({
         minWidth: 128,
         maxWidth: 128,
         padding: 16,
+        backgroundColor: selectedOrderId === order.id ? '#F280A1' : 'white',
       }}
       onPress={() => {
         if (setSelectedOrderId) {
           registerForPushNotifications().then((token) => {
             if (token) {
-              subscribeToOrder(order.id, token)
-                .then((response) => {
-                  setSelectedOrderId(order.id);
-                  return response.json();
-                })
-                .then((data) => {
-                  console.log(data);
-                })
-                .catch((err) => {
-                  console.error(err);
+              if (selectedOrderId && selectedOrderId !== order.id) {
+                unsubscribeToOrder(selectedOrderId, token);
+                subscribeToOrder(order.id, token)
+                  .then((response) => {
+                    setSelectedOrderId(order.id);
+                    return response.json();
+                  })
+                  .then((data) => {
+                    console.log(data);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                  });
+              } else if (selectedOrderId === order.id) {
+                unsubscribeToOrder(selectedOrderId, token).then(() => {
+                  setSelectedOrderId(undefined);
                 });
+              } else {
+                subscribeToOrder(order.id, token)
+                  .then((response) => {
+                    setSelectedOrderId(order.id);
+                    return response.json();
+                  })
+                  .then((data) => {
+                    console.log(data);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                  });
+              }
             }
           });
         }
